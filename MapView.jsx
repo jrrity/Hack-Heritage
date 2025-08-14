@@ -125,9 +125,6 @@ const MapView = () => {
         fontSize: '12px',
         fontFamily: 'monospace'
       }}>
-        <div><strong>📊 Map Status</strong></div>
-        <div>🎯 Data Points: {mapData.length}</div>
-        <div>🗺️ Map: {map ? '✅ Ready' : '⏳ Loading'}</div>
       </div>
 
       {/* Loading indicator */}
@@ -150,5 +147,6 @@ const MapView = () => {
     </div>
   );
 };
+
 
 export default MapView;
