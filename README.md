@@ -1,17 +1,18 @@
 ## Tech Stack
 
-**Frontend:**
+### Frontend
 - React (Vite)
 - Leaflet
 - CSS
 - React Router
 
-**Backend:**
+### Backend
 - Flask
 - Flask-CORS
 - Pandas
+- MongoDB
 
-**Other Tools:**
+### Other Tools
 - Git & GitHub
 - Node.js & npm
 - Python
