@@ -4,6 +4,7 @@
 - React (Vite)
 - Leaflet
 - CSS
+- React Router
 
 **Backend:**
 - Flask
