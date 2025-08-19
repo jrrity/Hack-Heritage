@@ -1,13 +1,26 @@
-Backend
+# Backend
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
 pip install flask flask-cors pandas
 
-Frontend
+# Run the backend server
+python app.py
+
+# Frontend
+# Navigate to frontend directory
 cd frontend
-npm create vite@latest .   # Choose React + JavaScript
+
+# Create a new React app using Vite
+npm create vite@latest .    # Choose "React" + "JavaScript"
+
+# Install dependencies
 npm install
 
-# Install React Router (for navigation)
+# Install additional libraries
 npm install react-router-dom
-
-# Install Leaflet for maps
 npm install leaflet react-leaflet
+
+# Run the development server
+npm run dev
