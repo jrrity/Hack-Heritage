@@ -11,6 +11,7 @@
 - Flask-CORS
 - Pandas
 - MongoDB
+- Pymongo
 
 ### Other Tools
 - Git & GitHub
