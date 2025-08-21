@@ -3,7 +3,7 @@
 cd backend
 
 # Install dependencies
-pip install flask flask-cors pandas
+pip install flask flask-cors pandas pymongo
 
 # Run the backend server
 python app.py
