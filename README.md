@@ -10,7 +10,7 @@
 - Flask
 - Flask-CORS
 - Pandas
-- MongoDB
+- MongoDB Compass
 - Pymongo
 
 ### Other Tools
