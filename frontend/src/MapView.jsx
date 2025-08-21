@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix marker icons
+// Fix Leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: new URL("leaflet/dist/images/marker-icon-2x.png", import.meta.url).href,
@@ -11,7 +10,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: new URL("leaflet/dist/images/marker-shadow.png", import.meta.url).href,
 });
 
-// Calculate centroid of points
+// Helper: calculate centroid
 const getCentroid = (points) => {
   let latSum = 0, lngSum = 0;
   points.forEach(p => {
@@ -25,7 +24,7 @@ const getCentroid = (points) => {
   };
 };
 
-// Group points by distance
+// Helper: group nearby points
 const groupPoints = (points, radiusMeters) => {
   const clusters = [];
   const used = new Set();
@@ -51,35 +50,47 @@ const groupPoints = (points, radiusMeters) => {
   return clusters;
 };
 
-const MapView = () => {
-  const [mapData, setMapData] = useState([]);
+const MapView = ({ fullscreen }) => {
+  const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
+  const [mapData, setMapData] = useState([]);
+  const layersRef = useRef([]); // keep track of added layers
 
+  // Initialize map
   useEffect(() => {
-    const mapInstance = L.map("map").setView([22.6, 88.35], 10);
+    if (!mapContainer.current) return;
+
+    const mapInstance = L.map(mapContainer.current).setView([22.6, 88.35], 10);
+
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© Envix",
+      attribution: "© OpenStreetMap contributors",
       maxZoom: 19,
     }).addTo(mapInstance);
+
     setMap(mapInstance);
+
     return () => mapInstance.remove();
   }, []);
 
+  // Fetch backend data
   useEffect(() => {
     fetch("http://127.0.0.1:5000/data")
       .then(res => res.json())
-      .then(data => setMapData(data))
+      .then(data => {
+        console.log("Fetched data:", data);
+        setMapData(data);
+      })
       .catch(err => console.error("Data fetch error:", err));
   }, []);
 
+  // Render markers / clusters
   useEffect(() => {
     if (!map || mapData.length === 0) return;
 
-    let layers = [];
-
     const renderMap = () => {
-      layers.forEach(layer => map.removeLayer(layer));
-      layers = [];
+      // Clear old layers
+      layersRef.current.forEach(layer => map.removeLayer(layer));
+      layersRef.current = [];
 
       const zoom = map.getZoom();
       if (zoom < 13) return;
@@ -88,33 +99,25 @@ const MapView = () => {
 
       clusters.forEach(clusterPoints => {
         if (clusterPoints.length < 3) {
-          // Show individual points normally
+          // Show individual points
           clusterPoints.forEach(p => {
             const marker = L.marker([p.latitude, p.longitude]).addTo(map);
-            marker.bindPopup(`
-              <div>
-                <b>Point</b><br>
-                <b>Latitude:</b> ${p.latitude}<br>
-                <b>Longitude:</b> ${p.longitude}
-              </div>
-            `);
+            marker.bindPopup(`<b>Point</b><br>Lat: ${p.latitude}<br>Lng: ${p.longitude}`);
             const circle = L.circle([p.latitude, p.longitude], {
               radius: 200,
               color: "rgba(0,123,255,0.7)",
               fillColor: "rgba(0,123,255,0.3)",
               fillOpacity: 0.3
             }).addTo(map);
-            layers.push(marker, circle);
+            layersRef.current.push(marker, circle);
           });
-        }
-        else {
-          // Show cluster marker
+        } else {
+          // Cluster centroid
           const centroid = getCentroid(clusterPoints);
-          let color = clusterPoints.length > 7 ? "red" : "orange";
+          const color = clusterPoints.length > 7 ? "red" : "orange";
 
           const clusterIcon = L.divIcon({
             html: `<div style="
-              pointer-events: auto;
               background:${color};
               border-radius:50%;
               width:40px;
@@ -124,7 +127,7 @@ const MapView = () => {
               justify-content:center;
               color:white;
               font-weight:bold;
-              cursor: pointer;">
+              cursor:pointer;">
               ${clusterPoints.length}
             </div>`,
             className: "",
@@ -134,78 +137,43 @@ const MapView = () => {
           const centroidMarker = L.marker([centroid.lat, centroid.lng], { icon: clusterIcon }).addTo(map);
           const clusterCircle = L.circle([centroid.lat, centroid.lng], {
             radius: 750,
-            color: "rgba(255, 81, 0, 0.7)",
-            fillColor: "rgba(255, 89, 0, 0.2)",
+            color: "rgba(255,81,0,0.7)",
+            fillColor: "rgba(255,89,0,0.2)",
             fillOpacity: 0.3
           }).addTo(map);
 
-          layers.push(centroidMarker, clusterCircle);
+          centroidMarker.bindPopup(`<b>Cluster</b><br>Size: ${centroid.count}<br>Lat: ${centroid.lat}<br>Lng: ${centroid.lng}`);
 
-          // Bind popup and ensure it opens on click
-          centroidMarker.bindPopup(`
-            <div style="min-width: 150px;">
-              <b>Centroid Point</b><br>
-              <b>Cluster Size:</b> ${centroid.count}<br>
-              <b>Latitude:</b> ${centroid.lat}<br>
-              <b>Longitude:</b> ${centroid.lng}<br>
-              <b>Zoom Level:</b> ${zoom}
-            </div>
-          `);
+          layersRef.current.push(centroidMarker, clusterCircle);
 
-          // Show points inside cluster as smaller markers with popups
+          // (Optional) show individual points inside cluster
           clusterPoints.forEach(p => {
             const innerMarker = L.marker([p.latitude, p.longitude]).addTo(map);
-            innerMarker.bindPopup(`
-              <div>
-                <b>Point</b><br>
-                <b>Latitude:</b> ${p.latitude.toFixed(6)}<br>
-                <b>Longitude:</b> ${p.longitude.toFixed(6)}
-              </div>
-            `);
-            const innerCircle = L.circle([p.latitude, p.longitude], {
-              radius: 200,
-              color: "rgba(0,123,255,0.7)",
-              fillColor: "rgba(0,123,255,0.3)",
-              fillOpacity: 0.3
-            }).addTo(map);
-            layers.push(innerMarker, innerCircle);
+            innerMarker.bindPopup(`<b>Point</b><br>Lat: ${p.latitude.toFixed(6)}<br>Lng: ${p.longitude.toFixed(6)}`);
+            layersRef.current.push(innerMarker);
           });
         }
       });
     };
+
     map.on("zoomend", renderMap);
     renderMap();
-    return () => {
-      map.off("zoomend", renderMap);
-      layers.forEach(layer => map.removeLayer(layer));
-    };
+
+    return () => map.off("zoomend", renderMap);
   }, [map, mapData]);
 
-  return (
-    <>
-  <div style={{ height: "100vh", width: "100vw", position: "fixed" ,}}>
-    <nav style={{
-      position: "relative",
-      top: 0,
-      left: 60,
-      width: "3%",
-      color: "white",
-      padding: "10px 20px",
-      display: "flex",
-      gap: "30px",
-      alignItems: "center",
-      zIndex: 1000,
-    }}>
-      <Link to="/" style={{ color: "white" }}>
-        <button>
-          ←
-        </button>
-        </Link>
-    </nav>
-    <div id="map" style={{ height: "100%", width: "100%" }} />
-  </div>
-</>
+  // Handle fullscreen toggle
+  useEffect(() => {
+    if (map) {
+      setTimeout(() => map.invalidateSize(), 300);
+    }
+  }, [fullscreen, map]);
 
+  return (
+    <div
+      ref={mapContainer}
+      style={{ width: "100%", height: "100vh" }} // ✅ force visible height
+    />
   );
 };
 
