@@ -3,7 +3,7 @@
 cd backend
 
 # Install dependencies
-pip install flask flask-cors pandas
+pip install flask flask-cors pandas pymongo
 
 # Run the backend server
 python app.py
@@ -19,8 +19,7 @@ npm create vite@latest .    # Choose "React" + "JavaScript"
 npm install
 
 # Install additional libraries
-npm install react-router-dom
-npm install leaflet react-leaflet
+npm install react-router-dom leaflet react-leaflet
 
 # Run the development server
 npm run dev
