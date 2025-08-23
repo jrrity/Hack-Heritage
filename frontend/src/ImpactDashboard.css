@@ -1,0 +1,93 @@
+/* ImpactDashboard.css */
+
+.dashboard-container {
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.dashboard-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dashboard-header .filter {
+  display: flex;
+  gap: 10px;
+}
+
+.filter select, 
+.filter input {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-title {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 20px;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+}

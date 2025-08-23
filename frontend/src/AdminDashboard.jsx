@@ -12,12 +12,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetch("http://127.0.0.1:5000/dashboard_stats")
       .then(res => res.json())
-      .then(data => {
-        setStats({
-          ngos: data.ngos,
-          volunteers: data.volunteers
-        });
-      })
+      .then(data => setStats({ ngos: data.ngos, volunteers: data.volunteers }))
       .catch(err => console.error(err));
   }, []);
 
@@ -33,7 +28,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetch("http://127.0.0.1:5000/ngos")
       .then(res => res.json())
-      .then(data => setNgos(data))
+      .then(data => {
+        // Only verified NGOs
+        setNgos(data.filter(n => n.status === "verified"));
+      })
       .catch(err => console.error(err));
   }, []);
 
@@ -41,12 +39,8 @@ export default function AdminDashboard() {
   const findMostCommon = (array, key) => {
     if (!array || array.length === 0) return "--";
     const counts = array.reduce((acc, item) => {
-      const values = Array.isArray(item[key])
-        ? item[key]
-        : (item[key] || "").split(",").map(s => s.trim());
-      values.forEach(val => {
-        if (val) acc[val] = (acc[val] || 0) + 1;
-      });
+      const values = Array.isArray(item[key]) ? item[key] : (item[key] || "").split(",").map(s => s.trim());
+      values.forEach(val => { if (val) acc[val] = (acc[val] || 0) + 1; });
       return acc;
     }, {});
     return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b, "--");
@@ -57,16 +51,19 @@ export default function AdminDashboard() {
     (v.fullName || "").toLowerCase().includes(volunteerSearch.toLowerCase())
   );
   const filteredNgos = ngos.filter(n =>
-    (n.name || "").toLowerCase().includes(ngoSearch.toLowerCase())
+    (n.ngoName || "").toLowerCase().includes(ngoSearch.toLowerCase())
   );
 
   return (
     <div>
       <header className="main-nav">
-        <div className="container">
-          <a href="#" className="logo">ARES Admin Panel</a>
-        </div>
-      </header>
+  <div className="container">
+    <a href="#" className="logo">ARES Admin Panel</a>
+    <nav>
+      <a href="/verify" className="nav-link">Verify NGOs</a>
+    </nav>
+  </div>
+</header>
 
       <main className="container">
         <section className="page-header">
@@ -88,7 +85,7 @@ export default function AdminDashboard() {
               <p className="metric-label">Top Volunteer Interest</p>
             </div>
             <div className="metric-card">
-              <span className="metric-value">{findMostCommon(ngos, "operation_area")}</span>
+              <span className="metric-value">{findMostCommon(ngos, "operationArea")}</span>
               <p className="metric-label">Top NGO Location</p>
             </div>
           </div>
@@ -123,7 +120,7 @@ export default function AdminDashboard() {
                     filteredVolunteers.map((v, idx) => (
                       <tr key={idx}>
                         <td>{v.fullName || "N/A"}</td>
-                        <td>{v.address || "N/A"}</td>
+                        <td>{v.city || "N/A"}</td>
                         <td>{Array.isArray(v.interests) ? v.interests.join(", ") : v.interests || "N/A"}</td>
                         <td>{v.availability || "N/A"}</td>
                       </tr>
@@ -148,6 +145,7 @@ export default function AdminDashboard() {
                 <thead>
                   <tr>
                     <th>NGO Name</th>
+                    <th>Contact Person</th>
                     <th>Contact Number</th>
                     <th>Location</th>
                     <th>Focus Areas</th>
@@ -156,15 +154,16 @@ export default function AdminDashboard() {
                 <tbody>
                   {filteredNgos.length === 0 ? (
                     <tr>
-                      <td colSpan={4} style={{ textAlign: "center" }}>No data found.</td>
+                      <td colSpan={5} style={{ textAlign: "center" }}>No data found.</td>
                     </tr>
                   ) : (
                     filteredNgos.map((n, idx) => (
                       <tr key={idx}>
-                        <td>{n.name || "N/A"}</td>
-                        <td>{n.contact_number || "N/A"}</td>
-                        <td>{n.operation_area || "N/A"}</td>
-                        <td>{Array.isArray(n.focus_areas) ? n.focus_areas.join(", ") : n.focus_areas || "N/A"}</td>
+                        <td>{n.ngoName || "N/A"}</td>
+                        <td>{n.contactPerson || "N/A"}</td>
+                        <td>{n.phone || "N/A"}</td>
+                        <td>{n.operationArea || "N/A"}</td>
+                        <td>{Array.isArray(n.focusAreas) ? n.focusAreas.join(", ") : n.focusAreas || "N/A"}</td>
                       </tr>
                     ))
                   )}

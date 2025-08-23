@@ -162,13 +162,6 @@ const MapView = ({ fullscreen }) => {
     return () => map.off("zoomend", renderMap);
   }, [map, mapData]);
 
-  // Handle fullscreen toggle
-  useEffect(() => {
-    if (map) {
-      setTimeout(() => map.invalidateSize(), 300);
-    }
-  }, [fullscreen, map]);
-
   return (
     <div
       ref={mapContainer}

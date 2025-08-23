@@ -64,14 +64,6 @@ const Impact = () => {
             <section className="dashboard-section container">
                 <div className="stats-grid">
                     <div className="stat-card">
-                        <span className="stat-number">{stats.meals}</span>
-                        <span className="stat-label">Meals Served ({stats.currentMonth})</span>
-                    </div>
-                    <div className="stat-card">
-                        <span className="stat-number">{stats.students}</span>
-                        <span className="stat-label">Students Educated</span>
-                    </div>
-                    <div className="stat-card">
                         <span className="stat-number">{stats.volunteers}</span>
                         <span className="stat-label">Volunteers Connected</span>
                     </div>

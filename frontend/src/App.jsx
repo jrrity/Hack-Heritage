@@ -5,11 +5,14 @@ import Home from "./Home";
 import MapView from "./MapView";
 import Impact from "./Impact";
 import Contact from "./Contact";
-import VolunteerRegistration from './VolunteerRegistration';
-import AdminDashboard from './AdminDashboard';
+import VolunteerRegistration from "./VolunteerRegistration";
+import AdminDashboard from "./AdminDashboard";
 import ImpactMap from "./ImpactMap";
 import Reg_NGO from "./Reg_NGO";
 import Survey from "./Survey";
+import Verify from "./Verify";
+import NGODashboard from "./NGODashboard";
+import Login from "./Login";
 
 function App() {
   return (
@@ -24,9 +27,12 @@ function App() {
         <Route path="/imp" element={<ImpactMap />} />
         <Route path="/reg_ngo" element={<Reg_NGO />} />
         <Route path="/survey" element={<Survey />} />
-
+        <Route path="/verify" element={<Verify />} />
+        <Route path="/ngo-dashboard/:id" element={<NGODashboard />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
 }
+
 export default App;
