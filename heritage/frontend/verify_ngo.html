@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify NGOs - ARES Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary-color: #005B5B;
+    --secondary-color: #FF6F61;
+    --background-color: #F9F9F9;
+    --text-color: #333333;
+    --white-color: #FFFFFF;
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Nunito Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); color: var(--text-color); background-color: var(--background-color); }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.main-nav { background-color: var(--white-color); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.main-nav .container { display: flex; justify-content: space-between; align-items: center; }
+.main-nav .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none;}
+.page-header { padding-top: 100px; padding-bottom: 30px; }
+.page-header h1 { font-size: 2.5rem; }
+.data-table-container { background-color: var(--white-color); padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 30px; }
+.data-table-container h3 { margin-top: 0; font-size: 1.5rem; }
+.search-input { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+.table-wrapper { max-height: 500px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+th { background-color: #f7f7f7; font-weight: 700; }
+tbody tr:hover { background-color: #f1f1f1; }
+button.verify-btn { background-color: var(--secondary-color); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+button.verify-btn:hover { background-color: #ff4a3a; }
+</style>
+</head>
+<body>
+
+<header class="main-nav">
+    <div class="container">
+        <a href="#" class="logo">ARES Admin Panel</a>
+        <nav>
+            <a href="admin.html" style="margin-left: 20px; text-decoration: none; color: var(--primary-color); font-weight: 600;">admin</a>
+        </nav>
+    </div>
+</header>
+
+
+<main class="container">
+<section class="page-header">
+    <h1>Verify Pending NGOs</h1>
+</section>
+
+<div class="data-table-container">
+    <input type="text" id="ngoSearch" class="search-input" placeholder="Search pending NGOs...">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>NGO Name</th>
+                    <th>Contact</th>
+                    <th>Location</th>
+                    <th>Focus Areas</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="ngoTableBody"></tbody>
+        </table>
+    </div>
+</div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+
+    const ngoTableBody = document.getElementById('ngoTableBody');
+
+    // Fetch pending NGOs from Flask backend
+    async function fetchPendingNgos() {
+        try {
+            const res = await fetch('http://127.0.0.1:5000/ngos/pending');
+            const data = await res.json();
+            return data;
+        } catch(err) {
+            console.error('Error fetching pending NGOs:', err);
+            return [];
+        }
+    }
+
+    async function renderPendingNgos() {
+        const ngos = await fetchPendingNgos();
+        ngoTableBody.innerHTML = '';
+        if (ngos.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 5;
+            cell.textContent = 'No pending NGOs.';
+            cell.style.textAlign = 'center';
+            row.appendChild(cell);
+            ngoTableBody.appendChild(row);
+        } else {
+            ngos.forEach(n => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${n.name || 'N/A'}</td>
+                    <td>${n.contact_person || 'N/A'}</td>
+                    <td>${n.operation_area || 'N/A'}</td>
+                    <td>${Array.isArray(n.focus_areas) ? n.focus_areas.join(', ') : n.focus_areas || 'N/A'}</td>
+                    <td><button class="verify-btn" data-id="${n._id}">Verify</button></td>
+                `;
+                ngoTableBody.appendChild(row);
+            });
+
+            // Add click event to verify buttons
+            document.querySelectorAll('.verify-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const ngoId = btn.getAttribute('data-id');
+                    try {
+                        const res = await fetch(`http://127.0.0.1:5000/ngos/verify/${ngoId}`, { method: 'POST' });
+                        const result = await res.json();
+                        alert(result.message || 'NGO verified!');
+                        renderPendingNgos(); // refresh table
+                    } catch(err) {
+                        console.error(err);
+                        alert('Error verifying NGO');
+                    }
+                });
+            });
+        }
+    }
+
+    renderPendingNgos();
+
+    // Search functionality
+    const searchInput = document.getElementById('ngoSearch');
+    searchInput.addEventListener('keyup', function() {
+        const term = this.value.toLowerCase();
+        const rows = ngoTableBody.getElementsByTagName('tr');
+        for (let row of rows) {
+            row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+        }
+    });
+});
+</script>
+
+</body>
+</html>

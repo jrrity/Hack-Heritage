@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Registration - ARES</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- START OF CSS STYLING --- */
+        :root {
+            --primary-color: #005B5B;      /* Deep Teal */
+            --secondary-color: #FF6F61;    /* Warm Coral */
+            --accent-yellow: #F9A825;
+            --accent-lavender: #A495E9;
+            --accent-green: #5A7D3A;
+            --background-color: #F9F9F9;
+            --text-color: #333333;
+            --white-color: #FFFFFF;
+            --font-heading: 'Poppins', sans-serif;
+            --font-body: 'Nunito Sans', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-body); color: var(--text-color); background-color: var(--background-color); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 80px 0; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); margin-bottom: 20px; }
+        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 60px; }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: none; cursor: pointer;}
+        .btn-primary { background-color: var(--secondary-color); color: var(--white-color); }
+        .btn-primary:hover { background-color: #e65a4c; transform: translateY(-2px); }
+        .main-nav { background-color: var(--white-color); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .main-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .main-nav .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none;}
+        .main-nav ul { list-style: none; display: flex; }
+        .main-nav ul li { margin: 0 20px; }
+        .main-nav ul li a { text-decoration: none; color: var(--text-color); font-weight: 700; transition: color 0.3s ease; }
+        .main-nav ul li a:hover { color: var(--secondary-color); }
+        footer { background-color: var(--primary-color); color: var(--white-color); padding: 60px 0 20px 0; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-bottom: 40px; }
+        .footer-grid h4 { font-family: var(--font-heading); margin-bottom: 15px; }
+        .footer-grid ul { list-style: none; }
+        .footer-grid ul li a { color: var(--white-color); text-decoration: none; opacity: 0.8; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); opacity: 0.7; }
+
+        .page-header {
+            padding-top: 150px;
+            padding-bottom: 60px;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 3rem;
+        }
+        .page-header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .registration-section {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .form-container {
+            background-color: var(--white-color);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .form-container h3 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: var(--font-body);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* --- START: CSS CHANGES FOR CHECKBOX ALIGNMENT --- */
+        .checkbox-item {
+            display: flex;
+            align-items: center; /* Vertically aligns the box and text */
+            margin-bottom: 10px; /* Provides space between each checkbox line */
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto; /* Prevents the checkbox from taking full width */
+            margin-right: 10px; /* Adds space between the box and the label */
+        }
+        
+        .checkbox-item label {
+            margin-bottom: 0; /* Removes the default bottom margin for labels */
+            font-weight: normal; /* Makes the label text not bold */
+        }
+        /* --- END: CSS CHANGES --- */
+
+        .volunteer-list-container h3 {
+             font-size: 1.8rem;
+             text-align: center;
+        }
+        .volunteer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .volunteer-card {
+            background-color: var(--white-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--accent-lavender);
+        }
+        .volunteer-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        .volunteer-card p {
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        .volunteer-card .interests {
+            margin-top: 10px;
+        }
+        .interest-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            background-color: #eee;
+        }
+
+        #successMessage {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--accent-green);
+            color: var(--white-color);
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none; /* Hidden by default */
+        }
+        
+        @media (max-width: 992px) {
+            .registration-section { grid-template-columns: 1fr; }
+            .volunteer-list-container { margin-top: 60px; }
+        }
+        @media (max-width: 768px) {
+            .main-nav ul { display: none; }
+            .volunteer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">ARES</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="register_vol.html">Get Involved</a></li>
+                    <li><a href="impact.html">Our Impact</a></li>
+                    <li><a href="survey.html">Survey</a></li>
+                </ul>
+            </nav>
+            <a href="donation.html" class="btn btn-primary">Donate Now</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Become a Volunteer</h1>
+                <p>Join our dedicated team of volunteers and become a thread in the fabric of change. Your contribution, big or small, creates a powerful impact in our communities.</p>
+            </div>
+        </section>
+
+        <section style="padding-top: 0;">
+            <div class="container registration-section">
+
+                <div class="form-container">
+                    <h3>Register Now</h3>
+                    <form id="volunteerForm">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Areas of Interest (Select at least one)</label>
+                            
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="interestEdu" name="interests" value="Education">
+                                    <label for="interestEdu">Education</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="interestHunger" name="interests" value="Food Distribution">
+                                    <label for="interestHunger">Food Distribution</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="interestHealth" name="interests" value="Health & Hygiene">
+                                    <label for="interestHealth">Health & Hygiene</label>
+                                </div>
+                            </div>
+                            </div>
+                        <div class="form-group">
+                            <label for="availability">Availability</label>
+                            <select id="availability" name="availability">
+                                <option value="weekends">Weekends</option>
+                                <option value="weekdays">Weekdays</option>
+                                <option value="flexible">Flexible</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Register as Volunteer</button>
+                        <div id="successMessage">Thank you for registering! We will contact you shortly.</div>
+                    </form>
+                </div>
+                 <img src="vol.png" alt="Volunteers doing survey" 
+                 style="width: 75%; 
+                 margin-left: 150px;
+                 border-radius: 10px; 
+                 margin-bottom: 30px; 
+                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <!--<div class="volunteer-list-container">
+                    <h3>Meet Our Volunteers</h3>
+                    <div class="volunteer-grid" id="volunteerGrid">
+                        <div class="volunteer-card">
+                            <h4>Priya Sharma</h4>
+                            <p>📍 Nanduara</p>
+                            <p>Availability: Weekends</p>
+                            <div class="interests">
+                                <span class="interest-tag">Education</span>
+                                <span class="interest-tag">Food Distribution</span>
+                            </div>
+                        </div>
+                        <div class="volunteer-card">
+                            <h4>Amit Das</h4>
+                            <p>📍 Kolkata</p>
+                            <p>Availability: Flexible</p>
+                            <div class="interests">
+                                <span class="interest-tag">Health & Hygiene</span>
+                            </div>
+                        </div>
+                         <div class="volunteer-card">
+                            <h4>Sunita Devi</h4>
+                            <p>📍 Nanduara</p>
+                            <p>Availability: Weekdays</p>
+                            <div class="interests">
+                                <span class="interest-tag">Food Distribution</span>
+                            </div>
+                        </div>
+                        </div>
+                </div>-->
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 ARES | All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- START OF JAVASCRIPT FOR FORM SUBMISSION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('volunteerForm');
+            const volunteerGrid = document.getElementById('volunteerGrid');
+            const successMessage = document.getElementById('successMessage');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+                const fullName = formData.get('fullName');
+                const address = formData.get('address');
+                const availability = formData.get('availability');
+                const interests = formData.getAll('interests');
+
+                const newCard = document.createElement('div');
+                newCard.className = 'volunteer-card';
+                
+                let interestsHTML = '';
+                interests.forEach(function(interest) {
+                    interestsHTML += `<span class="interest-tag">${interest}</span>`;
+                });
+
+                newCard.innerHTML = `
+                    <h4>${fullName}</h4>
+                    <p>📍 ${address.split(',')[0]}</p>
+                    <p>Availability: ${availability.charAt(0).toUpperCase() + availability.slice(1)}</p>
+                    <div class="interests">${interestsHTML}</div>
+                `;
+
+                volunteerGrid.prepend(newCard);
+                successMessage.style.display = 'block';
+                form.reset();
+                
+                setTimeout(function() {
+                    successMessage.style.display = 'none';
+                }, 4000);
+            });
+        });
+        // --- END OF JAVASCRIPT ---
+    </script>
+
+</body>
+</html>

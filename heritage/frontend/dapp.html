@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ARES Transparency Ledger</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #005B5B; --secondary-color: #FF6F61; --accent-green: #5A7D3A;
+      --accent-yellow: #F9A825; --white-color: #FFFFFF; --font-heading: 'Poppins', sans-serif;
+      --font-body: 'Nunito Sans', sans-serif; --background-color: #F9F9F9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background-color: var(--background-color); color: #333; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+    .btn { padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; cursor: pointer; border: 2px solid var(--primary-color); transition: all 0.3s ease; }
+    .btn-primary { background-color: var(--secondary-color); color: var(--white-color); border-color: var(--secondary-color); }
+    .btn-primary:hover { background-color: #e65a4c; border-color: #e65a4c; transform: translateY(-2px); }
+    .btn:disabled { background-color: #ccc; border-color: #ccc; cursor: not-allowed; }
+    .main-nav { background-color: var(--white-color); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .main-nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .main-nav .logo { font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-color); text-decoration: none;}
+    .main-nav ul { list-style: none; display: flex; align-items: center; gap: 20px; }
+    .main-nav ul li a { text-decoration: none; color: #333; font-weight: 700; }
+    .page-header { padding-top: 100px; padding-bottom: 30px; text-align: center; }
+    .page-header h1 { font-size: 2.8rem; font-family: var(--font-heading); }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-bottom: 40px; }
+    .metric-card { background-color: var(--white-color); padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    .metric-value { font-size: 2.5rem; font-weight: 700; color: var(--primary-color); }
+    .metric-label { font-size: 1rem; color: #555; font-weight: 700; }
+    .ledger-container { background-color: var(--white-color); padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;}
+    .ledger-header h3 { margin: 0; font-size: 1.8rem; }
+    .table-wrapper { max-height: 600px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+    .status { padding: 5px 10px; border-radius: 15px; font-weight: 700; font-size: 0.8rem; text-align: center; }
+    .status.verified { background-color: #e3f9e5; color: #3a8a43; }
+    .status.pending { background-color: #fff4e0; color: #b78103; }
+    .hash { font-family: monospace; font-size: 0.85rem; max-width: 120px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .action-btn { background-color: var(--primary-color); color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; }
+    .action-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header class="main-nav">
+    <div class="container">
+      <a href="#" class="logo">ARES Transparency</a>
+      <ul>
+        <li><a href="donation.html">Donate</a></li>
+        <li><a href="dapp.html">Ledger</a></li>
+        <li><button id="connectButton" class="btn btn-primary">Connect Wallet</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Community Transparency Ledger</h1>
+      <p>Track every donation and verified expense on-chain.</p>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="metric-card"><div class="metric-value" id="totalDonated">--</div><div class="metric-label">Total Donated</div></div>
+      <div class="metric-card"><div class="metric-value" id="totalSpent">--</div><div class="metric-label">Total Spent</div></div>
+      <div class="metric-card"><div class="metric-value" id="availableFunds">--</div><div class="metric-label">Available</div></div>
+      <div class="metric-card"><div class="metric-value" id="txCount">--</div><div class="metric-label">Transactions</div></div>
+    </section>
+
+    <section class="ledger-container">
+      <div class="ledger-header">
+        <h3>Ledger</h3>
+        <input type="text" id="searchInput" placeholder="Search transactions..." style="padding:10px; border:1px solid #ccc; border-radius:5px; flex:1; max-width:300px;">
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Amount (ETH)</th>
+              <th>Address</th>
+              <th>Timestamp</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody">
+            <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async()=>{
+      const connectBtn=document.getElementById("connectButton");
+      const ledgerBody=document.getElementById("ledgerBody");
+      const searchInput=document.getElementById("searchInput");
+
+      const totalDonatedEl=document.getElementById("totalDonated");
+      const totalSpentEl=document.getElementById("totalSpent");
+      const availableFundsEl=document.getElementById("availableFunds");
+      const txCountEl=document.getElementById("txCount");
+
+      const contractAddress="0x2eE2b2cCeFA3F6D7Bf6CfF335b090A8602c464dd";
+      const contractABI=[
+        {"inputs":[],"name":"getSummary","outputs":[
+          {"internalType":"uint256","name":"_totalDonated","type":"uint256"},
+          {"internalType":"uint256","name":"_totalSpent","type":"uint256"},
+          {"internalType":"uint256","name":"_available","type":"uint256"},
+          {"internalType":"uint256","name":"_txCount","type":"uint256"},
+          {"internalType":"address","name":"_owner","type":"address"}
+        ],"stateMutability":"view","type":"function"},
+        {"inputs":[],"name":"getTransactionCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+        {"inputs":[{"internalType":"uint256","name":"offset","type":"uint256"},{"internalType":"uint256","name":"limit","type":"uint256"}],"name":"getTransactions","outputs":[{"components":[
+          {"internalType":"uint256","name":"id","type":"uint256"},
+          {"internalType":"address","name":"contributorOrPayee","type":"address"},
+          {"internalType":"string","name":"txType","type":"string"},
+          {"internalType":"string","name":"description","type":"string"},
+          {"internalType":"uint256","name":"amount","type":"uint256"},
+          {"internalType":"uint256","name":"timestamp","type":"uint256"},
+          {"internalType":"bool","name":"isVerified","type":"bool"}
+        ],"internalType":"struct ARES_TransparencyV2.Transaction[]","name":"items","type":"tuple[]"}],"stateMutability":"view","type":"function"}
+      ];
+
+      let provider,signer,contract,allTx=[];
+
+      async function connectWallet(){
+        if(!window.ethereum)return alert("Install MetaMask!");
+        await window.ethereum.request({method:"eth_requestAccounts"});
+        provider=new ethers.BrowserProvider(window.ethereum);
+        signer=await provider.getSigner();
+        contract=new ethers.Contract(contractAddress,contractABI,signer);
+        connectBtn.textContent=(await signer.getAddress()).slice(0,6)+"..."+(await signer.getAddress()).slice(-4);
+        connectBtn.disabled=true;
+        loadSummary();
+        loadLedger();
+      }
+
+      async function loadSummary(){
+        try{
+          const summary=await contract.getSummary();
+          totalDonatedEl.textContent=ethers.formatEther(summary._totalDonated)+" ETH";
+          totalSpentEl.textContent=ethers.formatEther(summary._totalSpent)+" ETH";
+          availableFundsEl.textContent=ethers.formatEther(summary._available)+" ETH";
+          txCountEl.textContent=summary._txCount.toString();
+        }catch(e){console.error(e);}
+      }
+
+      async function loadLedger(){
+        try{
+          const count=await contract.getTransactionCount();
+          const txs=await contract.getTransactions(0,count);
+          allTx=txs;
+          renderTable(txs);
+        }catch(e){console.error(e);}
+      }
+
+      function renderTable(txs){
+        ledgerBody.innerHTML="";
+        if(txs.length===0){ledgerBody.innerHTML="<tr><td colspan='7' style='text-align:center;'>No transactions yet</td></tr>";return;}
+        txs.forEach(tx=>{
+          const row=document.createElement("tr");
+          row.innerHTML=`
+            <td>${tx.id}</td>
+            <td>${tx.txType}</td>
+            <td>${tx.description}</td>
+            <td>${ethers.formatEther(tx.amount)} ETH</td>
+            <td class="hash">${tx.contributorOrPayee}</td>
+            <td>${new Date(Number(tx.timestamp)*1000).toLocaleString()}</td>
+            <td><span class="status ${tx.isVerified?"verified":"pending"}">${tx.isVerified?"Verified":"Pending"}</span></td>
+          `;
+          ledgerBody.appendChild(row);
+        });
+      }
+
+      searchInput.addEventListener("input",()=>{
+        const q=searchInput.value.toLowerCase();
+        const filtered=allTx.filter(tx=>
+          tx.txType.toLowerCase().includes(q) ||
+          tx.description.toLowerCase().includes(q) ||
+          tx.contributorOrPayee.toLowerCase().includes(q)
+        );
+        renderTable(filtered);
+      });
+
+      connectBtn.addEventListener("click",connectWallet);
+    });
+  </script>
+</body>
+</html>

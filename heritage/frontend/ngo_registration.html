@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Registration - ARES</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- START OF CSS STYLING (Same as other pages for consistency) --- */
+        :root {
+            --primary-color: #005B5B;      /* Deep Teal */
+            --secondary-color: #FF6F61;    /* Warm Coral */
+            --accent-yellow: #F9A825;
+            --accent-lavender: #A495E9;
+            --accent-green: #5A7D3A;
+            --background-color: #F9F9F9;
+            --text-color: #333333;
+            --white-color: #FFFFFF;
+            --font-heading: 'Poppins', sans-serif;
+            --font-body: 'Nunito Sans', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-body); color: var(--text-color); background-color: var(--background-color); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 80px 0; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--primary-color); margin-bottom: 20px; }
+        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 60px; }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: none; cursor: pointer;}
+        .btn-primary { background-color: var(--secondary-color); color: var(--white-color); }
+        .btn-primary:hover { background-color: #e65a4c; transform: translateY(-2px); }
+        .main-nav { background-color: var(--white-color); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .main-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .main-nav .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none;}
+        .main-nav ul { list-style: none; display: flex; }
+        .main-nav ul li { margin: 0 20px; }
+        .main-nav ul li a { text-decoration: none; color: var(--text-color); font-weight: 700; transition: color 0.3s ease; }
+        .main-nav ul li a:hover { color: var(--secondary-color); }
+        footer { background-color: var(--primary-color); color: var(--white-color); padding: 60px 0 20px 0; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-bottom: 40px; }
+        .footer-grid h4 { font-family: var(--font-heading); margin-bottom: 15px; }
+        .footer-grid ul { list-style: none; }
+        .footer-grid ul li a { color: var(--white-color); text-decoration: none; opacity: 0.8; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); opacity: 0.7; }
+
+        /* --- NEW STYLES for this page --- */
+        .page-header {
+            padding-top: 150px;
+            padding-bottom: 60px;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 3rem;
+        }
+        .page-header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .ngo-section {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .form-container, .image-container {
+             background-color: var(--white-color);
+             padding: 40px;
+             border-radius: 10px;
+             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .form-container h3 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: var(--font-body);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .ngo-list-container h3 {
+             font-size: 1.8rem;
+             text-align: center;
+        }
+        .ngo-card {
+            background-color: var(--white-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--accent-green);
+        }
+        .ngo-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        .ngo-card p {
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+         .ngo-card .focus-areas {
+            margin-top: 10px;
+        }
+        .focus-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            background-color: #eee;
+        }
+
+        #successMessage, #errorMessage {
+            text-align: center;
+            padding: 15px;
+            color: var(--white-color);
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none; /* Hidden by default */
+        }
+        #successMessage { background-color: var(--accent-green); }
+        #errorMessage { background-color: var(--secondary-color); }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .ngo-section { grid-template-columns: 1fr; }
+            .ngo-list-container { margin-top: 60px; }
+        }
+        @media (max-width: 768px) {
+            .main-nav ul { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">ARES</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="register_vol.html">Get Involved</a></li>
+                    <li><a href="impact.html">Our Impact</a></li>
+                </ul>
+            </nav>
+            <a href="donation.html" class="btn btn-primary">Donate Now</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Partner with Us</h1>
+                <p>Amplify your impact by joining the ARES network. Register your organization to connect with volunteers, receive targeted donations, and collaborate on building a stronger community.</p>
+            </div>
+        </section>
+
+        <section style="padding-top: 0;">
+            <div class="container ngo-section">
+                <div>
+                     <div class="form-container">
+                        <h3>NGO Registration Form</h3>
+                        <form id="ngoForm">
+                            <div class="form-group">
+                                <label for="ngoName">Official NGO Name</label>
+                                <input type="text" id="ngoName" name="ngoName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regId">Registration ID (e.g., Trust/Society Act ID)</label>
+                                <input type="text" id="regId" name="regId" required>
+                            </div>
+                             <div class="form-group">
+                                <label for="contactPerson">Contact Person</label>
+                                <input type="text" id="contactPerson" name="contactPerson" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Contact Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contactNumber">Contact Number</label>
+                                <input type="tel" id="contactNumber" name="contactNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="operationArea">Primary Area of Operation (e.g., Kolkata, Nanduara)</label>
+                                <input type="text" id="operationArea" name="operationArea" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="focusAreas">Main Focus Areas (e.g., Education, Hunger)</label>
+                                <input type="text" id="focusAreas" name="focusAreas" placeholder="Separate with commas" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Brief Description of Your Mission</label>
+                                <textarea id="description" name="description" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Submit for Verification</button>
+                            <div id="successMessage">Thank you! Your application has been submitted.</div>
+                            <div id="errorMessage">An error occurred. Please try again.</div>
+                        </form>
+                    </div>
+                     <img src="ngo.png" alt="Volunteers working together" 
+                     style="width: 100%;       
+                     border-radius: 10px;
+                     margin-top: 30px; 
+                     box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                </div>
+
+                <div class="ngo-list-container">
+                    <h3>Our Partner NGOs</h3>
+                    <div id="ngoGrid">
+                        </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 ARES | All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('ngoForm');
+            const ngoGrid = document.getElementById('ngoGrid');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            const API_URL = 'http://127.0.0.1:5000'; // Your Flask backend URL
+
+            // --- 1. Function to fetch and display NGOs ---
+            const loadNGOs = async () => {
+                try {
+                    const response = await fetch(`${API_URL}/ngos`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const ngos = await response.json();
+                    
+                    ngoGrid.innerHTML = ''; // Clear existing list
+
+                    if (ngos.length === 0) {
+                        ngoGrid.innerHTML = '<p>No partner NGOs found. Be the first to register!</p>';
+                        return;
+                    }
+
+                    ngos.forEach(ngo => {
+                        const card = document.createElement('div');
+                        card.className = 'ngo-card';
+                        
+                        // Create HTML for focus area tags
+                        let focusTagsHTML = '';
+                        if(ngo.focus_areas && Array.isArray(ngo.focus_areas)) {
+                            ngo.focus_areas.forEach(area => {
+                                focusTagsHTML += `<span class="focus-tag">${area}</span>`;
+                            });
+                        }
+
+                        card.innerHTML = `
+                            <h4>${ngo.name}</h4>
+                            <p><strong>Contact:</strong> ${ngo.contact_person}</p>
+                            <p><strong>Phone:</strong> ${ngo.phone}</p>
+                            <p>📍 ${ngo.operation_area}</p>
+                            <div class="focus-areas">${focusTagsHTML}</div>
+                        `;
+                        ngoGrid.appendChild(card);
+                    });
+
+                } catch (error) {
+                    console.error('Error loading NGOs:', error);
+                    ngoGrid.innerHTML = '<p style="color:red;">Could not load partner NGOs.</p>';
+                }
+            };
+
+            // --- 2. Event listener for the form submission ---
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default browser submission
+                
+                // Hide any previous messages
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+
+                // Collect data into a JavaScript object
+                const ngoData = {
+                    ngoName: document.getElementById('ngoName').value,
+                    regId: document.getElementById('regId').value,
+                    contactPerson: document.getElementById('contactPerson').value,
+                    email: document.getElementById('email').value,
+                    contactNumber: document.getElementById('contactNumber').value,
+                    operationArea: document.getElementById('operationArea').value,
+                    // Split focus areas string into an array, and trim whitespace
+                    focusAreas: document.getElementById('focusAreas').value.split(',').map(item => item.trim()),
+                    description: document.getElementById('description').value
+                };
+
+                try {
+                    const response = await fetch(`${API_URL}/register/ngo`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(ngoData),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to submit form');
+                    }
+
+                    // --- On Success ---
+                    const result = await response.json();
+                    console.log('Success:', result);
+
+                    // Show success message
+                    successMessage.textContent = result.message || 'Thank you! Your application has been submitted.';
+                    successMessage.style.display = 'block';
+                    
+                    form.reset(); // Clear the form fields
+                    loadNGOs(); // Refresh the list of NGOs on the page
+
+                    // Hide message after 5 seconds
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+
+                } catch (error) {
+                    // --- On Failure ---
+                    console.error('Error submitting form:', error);
+                    errorMessage.style.display = 'block';
+                     setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 5000);
+                }
+            });
+
+            // --- 3. Initial load of NGOs when the page is ready ---
+            loadNGOs();
+        });
+    </script>
+</body>
+</html>

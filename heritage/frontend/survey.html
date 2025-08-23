@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Household Survey Form - ARES</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Base Styles (Consistent with other pages) --- */
+        :root {
+            --primary-color: #005B5B;      /* Deep Teal */
+            --secondary-color: #FF6F61;    /* Warm Coral */
+            --accent-yellow: #F9A825;
+            --accent-green: #5A7D3A;
+            --background-color: #F9F9F9;
+            --text-color: #333333;
+            --white-color: #FFFFFF;
+            --font-heading: 'Poppins', sans-serif;
+            --font-body: 'Nunito Sans', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-body); color: var(--text-color); background-color: var(--background-color); line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: none; cursor: pointer;}
+        .btn-primary { background-color: var(--secondary-color); color: var(--white-color); }
+        .btn-primary:hover { background-color: #e65a4c; transform: translateY(-2px); }
+        .main-nav { background-color: var(--white-color); padding: 15px 0; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .main-nav .container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; }
+        .main-nav .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none;}
+        .main-nav ul { list-style: none; display: flex; }
+        .main-nav ul li { margin: 0 20px; }
+        .main-nav ul li a { text-decoration: none; color: var(--text-color); font-weight: 700; }
+        footer { background-color: var(--primary-color); color: var(--white-color); padding: 60px 0 20px 0; text-align: center; }
+        
+        /* --- Page Specific Styles --- */
+        .page-header {
+            padding-top: 120px;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .survey-form-container {
+            background-color: var(--white-color);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 60px;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        legend {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 0 10px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #444;
+        }
+        .bengali-text {
+            font-weight: normal;
+            font-size: 1rem;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: var(--font-body);
+        }
+        .radio-group div {
+            margin-bottom: 8px;
+        }
+        .radio-group label {
+            font-weight: normal;
+            display: inline-block;
+            margin-left: 8px;
+            margin-right: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .form-row .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-row .compact-label {
+            font-size: 0.9rem;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        .form-row .compact-label .bengali-text {
+            font-size: 0.85rem;
+        }
+        .location-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .location-input-group input {
+            flex-grow: 1;
+        }
+        .btn-location {
+            padding: 0 20px;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .btn-location:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        .conditional {
+            display: none;
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 3px solid var(--accent-yellow);
+        }
+        #successMessage {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--accent-green);
+            color: var(--white-color);
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-nav">
+        <div class="container">
+            <a href="index.html" class="logo">ARES</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="get-involved.html">Get Involved</a></li>
+                    <li><a href="impact.html">Our Impact</a></li>
+                    <li><a href="survey.html">Survey</a></li>
+                    <li><a href="/map">Problem Map</a></li>
+                </ul>
+            </nav>
+            <a href="donation.html" class="btn btn-primary">Donate Now</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div>
+                <h1>Household Survey Form</h1>
+                <p>To be filled by ARES volunteers during field visits.</p>
+            </div>
+        </section>
+
+        <div class="container survey-form-container">
+            <form id="surveyForm">
+                
+                <fieldset>
+                    <legend>Section A: General Household Information</legend>
+                    <div class="form-group">
+                        <label for="surveyLocation">Survey Location<br><span class="bengali-text">সমীক্ষার স্থান</span></label>
+                        <div class="location-input-group">
+                            <input type="text" id="surveyLocation" name="surveyLocation" placeholder="Kolkata" required>
+                            <button type="button" id="getLocationBtn" class="btn-location">Get Current Location</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="headOfHousehold">Name of the Head of Household (Optional)<br><span class="bengali-text">পরিবারের প্রধানের নাম (ঐচ্ছিক)</span></label>
+                        <input type="text" id="headOfHousehold" name="headOfHousehold">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="respondentAge">Age of the Respondent<br><span class="bengali-text">উত্তরদাতার বয়স</span></label>
+                            <input type="number" id="respondentAge" name="respondentAge" min="18">
+                        </div>
+                        <div class="form-group">
+                             <label for="respondentGender">Gender of the Respondent<br><span class="bengali-text">উত্তরদাতার লিঙ্গ</span></label>
+                             <select id="respondentGender" name="respondentGender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male / পুরুষ</option>
+                                <option value="Female">Female / মহিলা</option>
+                                <option value="Other">Other / অন্যান্য</option>
+                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>How many members are there in your family?<br><span class="bengali-text">আপনার পরিবারে মোট কতজন সদস্য আছেন?</span></label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="familyAdults" class="compact-label">Adults (Above 18)<br><span class="bengali-text">প্রাপ্তবয়স্ক</span></label>
+                                <input type="number" id="familyAdults" name="familyAdults" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="familyChildren" class="compact-label">Children (5-18)<br><span class="bengali-text">শিশু (৫-১৮)</span></label>
+                                <input type="number" id="familyChildren" name="familyChildren" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="familyYoungChildren" class="compact-label">Young Children (<5)<br><span class="bengali-text">ছোট শিশু (<৫)</span></label>
+                                <input type="number" id="familyYoungChildren" name="familyYoungChildren" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>For how long have you been living in this area?<br><span class="bengali-text">আপনি এই এলাকায় কতদিন ধরে বসবাস করছেন?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="res_1" name="residencyDuration" value="<1"><label for="res_1">< 1 year / < ১ বছর</label></div>
+                            <div><input type="radio" id="res_2" name="residencyDuration" value="1-5"><label for="res_2">1-5 years / ১-৫ বছর</label></div>
+                            <div><input type="radio" id="res_3" name="residencyDuration" value="6-10"><label for="res_3">6-10 years / ৬-১০ বছর</label></div>
+                            <div><input type="radio" id="res_4" name="residencyDuration" value=">10"><label for="res_4">> 10 years / > ১০ বছর</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>What is the type of your house?<br><span class="bengali-text">আপনার বাড়ির ধরন কি?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="house_1" name="houseType" value="Kutcha"><label for="house_1">Kutcha (Mud, thatch) / কাঁচা (মাটি, খড়)</label></div>
+                            <div><input type="radio" id="house_2" name="houseType" value="Semi-pucca"><label for="house_2">Semi-pucca (Tin roof, brick walls) / সেমি-পাকা</label></div>
+                            <div><input type="radio" id="house_3" name="houseType" value="Pucca"><label for="house_3">Pucca (Concrete roof) / পাকা</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Do you have an electricity connection in your house?<br><span class="bengali-text">আপনার বাড়িতে কি বিদ্যুৎ সংযোগ আছে?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="elec_yes" name="electricity" value="Yes"><label for="elec_yes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="elec_no" name="electricity" value="No"><label for="elec_no">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Where do you get your drinking water from?<br><span class="bengali-text">আপনারা পানীয় জল কোথা থেকে সংগ্রহ করেন?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="water_1" name="waterSource" value="Municipal Tap"><label for="water_1">Municipal Tap / পৌরসভার কল</label></div>
+                            <div><input type="radio" id="water_2" name="waterSource" value="Tube well"><label for="water_2">Tube well / টিউবওয়েল</label></div>
+                            <div><input type="radio" id="water_3" name="waterSource" value="Purchased Water"><label for="water_3">Purchased Water / কেনার জল</label></div>
+                            <div><input type="radio" id="water_4" name="waterSource" value="Other"><label for="water_4">Other / অন্যান্য</label></div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Section B: Hunger & Food Security</legend>
+                     <div class="form-group">
+                        <label>In total, how many times did your family members eat yesterday?<br><span class="bengali-text">গতকাল আপনার পরিবারের সদস্যরা মোট কতবার খাবার খেয়েছেন?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="meals_1" name="mealsYesterday" value="Once"><label for="meals_1">Once / একবার</label></div>
+                            <div><input type="radio" id="meals_2" name="mealsYesterday" value="Twice"><label for="meals_2">Twice / দুইবার</label></div>
+                            <div><input type="radio" id="meals_3" name="mealsYesterday" value="Three+"><label for="meals_3">Three or more times / তিনবার বা তার বেশি</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>In the last month, did you ever run out of food because of a lack of money?<br><span class="bengali-text">গত মাসে, এমন কি কখনও হয়েছে যে টাকার অভাবে আপনাদের খাবার শেষ হয়ে গিয়েছিল?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="food_run_out_yes" name="foodRunOut" value="Yes"><label for="food_run_out_yes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="food_run_out_no" name="foodRunOut" value="No"><label for="food_run_out_no">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>In the last month, did you or any family member have to skip a meal because there wasn't enough money?<br><span class="bengali-text">গত মাসে, এমন কি কখনও হয়েছে যে টাকার অভাবে আপনাকে বা আপনার পরিবারের কোনো সদস্যকে একবেলা খাবার না খেয়ে থাকতে হয়েছে?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="skipMealYes" name="skipMeal" value="Yes"><label for="skipMealYes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="skipMealNo" name="skipMeal" value="No"><label for="skipMealNo">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Do you have a Ration Card (PDS)?<br><span class="bengali-text">আপনার কি রেশন কার্ড আছে?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="rationCardYes" name="rationCard" value="Yes"><label for="rationCardYes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="rationCardNo" name="rationCard" value="No"><label for="rationCardNo">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group conditional" id="rationCardTypeGroup">
+                        <label for="rationCardType">If yes, which type?<br><span class="bengali-text">যদি হ্যাঁ হয়, কোন ধরণের কার্ড?</span></label>
+                        <select id="rationCardType" name="rationCardType">
+                            <option value="">Select Type</option>
+                            <option value="AAY">AAY</option> <option value="SPHH">SPHH</option> <option value="PHH">PHH</option>
+                            <option value="RKSY-I">RKSY-I</option> <option value="RKSY-II">RKSY-II</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Do you receive your entitled items from the ration shop every month?<br><span class="bengali-text">আপনি কি প্রতি মাসে রেশন দোকান থেকে নির্ধারিত সামগ্রী পান?</span></label>
+                         <div class="radio-group">
+                            <div><input type="radio" id="ration_items_1" name="rationItems" value="Yes"><label for="ration_items_1">Yes, get everything / হ্যাঁ, সব পাই</label></div>
+                            <div><input type="radio" id="ration_items_2" name="rationItems" value="Partially"><label for="ration_items_2">Get partially / আংশিক পাই</label></div>
+                            <div><input type="radio" id="ration_items_3" name="rationItems" value="No"><label for="ration_items_3">No, don't get / না, পাই না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Do the children in your family receive food from Anganwadi (ICDS) or school Mid-Day Meal?<br><span class="bengali-text">আপনার পরিবারের শিশুরা কি অঙ্গনওয়াড়ি কেন্দ্র বা স্কুলের মিড-ডে মিল থেকে খাবার পায়?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="icds_1" name="icdsMeal" value="Regularly"><label for="icds_1">Yes, regularly / হ্যাঁ, নিয়মিত</label></div>
+                            <div><input type="radio" id="icds_2" name="icdsMeal" value="Irregularly"><label for="icds_2">Yes, but irregularly / হ্যাঁ, কিন্তু অনিয়মিত</label></div>
+                            <div><input type="radio" id="icds_3" name="icdsMeal" value="No"><label for="icds_3">No / না</label></div>
+                            <div><input type="radio" id="icds_4" name="icdsMeal" value="NA"><label for="icds_4">Not Applicable / প্রযোজ্য নয়</label></div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Section C: Education</legend>
+                    <div class="form-group">
+                        <label>What is the highest educational qualification of the head of the household?<br><span class="bengali-text">আপনার পরিবারের প্রধানের সর্বোচ্চ শিক্ষাগত যোগ্যতা কি?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="edu_1" name="headEducation" value="Illiterate"><label for="edu_1">Illiterate / নিরক্ষর</label></div>
+                            <div><input type="radio" id="edu_2" name="headEducation" value="Can sign"><label for="edu_2">Can sign name / স্বাক্ষর করতে পারেন</label></div>
+                            <div><input type="radio" id="edu_3" name="headEducation" value="Primary"><label for="edu_3">Primary (Class I-V) / প্রাথমিক</label></div>
+                            <div><input type="radio" id="edu_4" name="headEducation" value="Secondary"><label for="edu_4">Secondary (Class VI-X) / মাধ্যমিক</label></div>
+                            <div><input type="radio" id="edu_5" name="headEducation" value="Higher Secondary+"><label for="edu_5">Higher Secondary or above (Class XI+) / উচ্চ মাধ্যমিক বা তার বেশি</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Do all children aged 5-18 in your family go to school?<br><span class="bengali-text">আপনার পরিবারে ৫-১৮ বছর বয়সী সব শিশু কি স্কুলে যায়?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="schoolGoYes" name="schoolGo" value="Yes"><label for="schoolGoYes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="schoolGoNo" name="schoolGo" value="No"><label for="schoolGoNo">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group conditional" id="schoolReasonGroup">
+                        <label>If 'No', what is the main reason for not going to school?<br><span class="bengali-text">স্কুলে না যাওয়ার প্রধান কারণ কী?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="reason_1" name="schoolReason" value="Cost"><label for="reason_1">Cannot afford expenses / খরচ চালানো সম্ভব নয়</label></div>
+                            <div><input type="radio" id="reason_2" name="schoolReason" value="Work"><label for="reason_2">Have to work to support family / পরিবারকে সাহায্য করতে হয়</label></div>
+                            <div><input type="radio" id="reason_3" name="schoolReason" value="Distance"><label for="reason_3">School is too far / স্কুল অনেক দূরে</label></div>
+                            <div><input type="radio" id="reason_4" name="schoolReason" value="Interest"><label for="reason_4">Not interested in studies / পড়াশোনায় আগ্রহ নেই</label></div>
+                            <div><input type="radio" id="reason_5" name="schoolReason" value="Other"><label for="reason_5">Other / অন্যান্য</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>What type of school do the children attend?<br><span class="bengali-text">শিশুরা কোন ধরনের স্কুলে যায়?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="schoolType_1" name="schoolType" value="Government"><label for="schoolType_1">Government / সরকারি</label></div>
+                            <div><input type="radio" id="schoolType_2" name="schoolType" value="Private"><label for="schoolType_2">Private / বেসরকারি</label></div>
+                            <div><input type="radio" id="schoolType_3" name="schoolType" value="Other"><label for="schoolType_3">Other / অন্যান্য</label></div>
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label>In your opinion, what is the biggest obstacle for children's education in this area?<br><span class="bengali-text">আপনার মতে, এই এলাকার শিশুদের পড়াশোনার ক্ষেত্রে সবচেয়ে বড় বাধা কী?</span></label>
+                        <textarea id="eduObstacle" name="eduObstacle" rows="3"></textarea>
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>Section D: Poverty & Livelihood</legend>
+                    <div class="form-group">
+                        <label>What is the primary occupation of the main earning member?<br><span class="bengali-text">আপনার পরিবারের প্রধান উপার্জনকারী সদস্যের পেশা কী?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="occ_1" name="occupation" value="Daily wage"><label for="occ_1">Daily wage labourer / দিনমজুর</label></div>
+                            <div><input type="radio" id="occ_2" name="occupation" value="Rickshaw puller"><label for="occ_2">Rickshaw/Van puller / রিকশা/ভ্যান চালক</label></div>
+                            <div><input type="radio" id="occ_3" name="occupation" value="Domestic help"><label for="occ_3">Domestic help / গৃহকর্মী</label></div>
+                            <div><input type="radio" id="occ_4" name="occupation" value="Hawker"><label for="occ_4">Hawker/Vendor / ফেরিওয়ালা</label></div>
+                            <div><input type="radio" id="occ_5" name="occupation" value="Small business"><label for="occ_5">Small business / ছোট ব্যবসা</label></div>
+                            <div><input type="radio" id="occ_6" name="occupation" value="Private job"><label for="occ_6">Private job / বেসরকারি চাকরি</label></div>
+                            <div><input type="radio" id="occ_7" name="occupation" value="Other"><label for="occ_7">Other / অন্যান্য</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Is the family's income regular or irregular/seasonal?<br><span class="bengali-text">পরিবারের উপার্জন কি স্থায়ী না অস্থায়ী?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="income_1" name="incomeType" value="Regular"><label for="income_1">Regular / স্থায়ী</label></div>
+                            <div><input type="radio" id="income_2" name="incomeType" value="Irregular"><label for="income_2">Irregular / অস্থায়ী</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="monthlyIncome">What is the approximate monthly income of your household?<br><span class="bengali-text">আপনার পরিবারের আনুমানিক মাসিক আয় কত?</span></label>
+                        <select id="monthlyIncome" name="monthlyIncome">
+                            <option value="">Select Range</option>
+                            <option value="3000"> ₹3,000</option>
+                            <option value="3001-5000">₹3,001 - ₹5,000</option>
+                            <option value="5001-10000">₹5,001 - ₹10,000</option>
+                            <option value="10001-15000">₹10,001 - ₹15,000</option>
+                            <option value=">15000">> ₹15,000</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label>Does any member of the household have a bank account?<br><span class="bengali-text">পরিবারের কোনো সদস্যের কি ব্যাঙ্ক অ্যাকাউন্ট আছে?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="bank_yes" name="bankAccount" value="Yes"><label for="bank_yes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="bank_no" name="bankAccount" value="No"><label for="bank_no">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Does your household have any outstanding loans (debt)?<br><span class="bengali-text">আপনার পরিবারের কি কোনো ঋণ আছে (ধার)?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="loan_yes" name="hasLoan" value="Yes"><label for="loan_yes">Yes / হ্যাঁ</label></div>
+                            <div><input type="radio" id="loan_no" name="hasLoan" value="No"><label for="loan_no">No / না</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group conditional" id="loanSourceGroup">
+                        <label>If yes, from where?<br><span class="bengali-text">যদি হ্যাঁ হয়, কোথা থেকে নিয়েছেন?</span></label>
+                        <div class="radio-group">
+                             <div><input type="radio" id="loan_1" name="loanSource" value="Bank"><label for="loan_1">Bank / ব্যাংক</label></div>
+                             <div><input type="radio" id="loan_2" name="loanSource" value="SHG"><label for="loan_2">SHG / স্বনির্ভর গোষ্ঠী</label></div>
+                             <div><input type="radio" id="loan_3" name="loanSource" value="Moneylender"><label for="loan_3">Moneylender / মহাজন</label></div>
+                             <div><input type="radio" id="loan_4" name="loanSource" value="Friends/Relatives"><label for="loan_4">Friends/Relatives / বন্ধু/আত্মীয়</label></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                         <label>Do you receive benefits from any West Bengal government schemes?<br><span class="bengali-text">আপনি কি পশ্চিমবঙ্গ সরকারের কোনো প্রকল্পের সুবিধা পান? (যেমন - স্বাস্থ্য সাথী, লক্ষ্মীর ভান্ডার, ইত্যাদি)?</span></label>
+                         <input type="text" id="govtSchemes" name="govtSchemes" placeholder="List any schemes">
+                    </div>
+                    <div class="form-group">
+                         <label>Where do you go for medical treatment when someone is sick?<br><span class="bengali-text">অসুস্থ হলে আপনারা চিকিৎসার জন্য কোথায় যান?</span></label>
+                        <div class="radio-group">
+                             <div><input type="radio" id="med_1" name="medicalTreatment" value="Govt Hospital"><label for="med_1">Government hospital / সরকারি হাসপাতাল</label></div>
+                             <div><input type="radio" id="med_2" name="medicalTreatment" value="Private Doctor"><label for="med_2">Private doctor/clinic / বেসরকারি ডাক্তার</label></div>
+                             <div><input type="radio" id="med_3" name="medicalTreatment" value="Pharmacy"><label for="med_3">Pharmacy/Chemist / ওষুধের দোকান</label></div>
+                             <div><input type="radio" id="med_4" name="medicalTreatment" value="Unqualified"><label for="med_4">Unqualified practitioner / হাতুড়ে ডাক্তার</label></div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Section E: Concluding Question</legend>
+                    <div class="form-group">
+                        <label>In your opinion, what is the most important thing needed for the improvement of your family and this community?<br><span class="bengali-text">আপনার মতে, আপনার পরিবার এবং এই এলাকার উন্নতির জন্য সবচেয়ে জরুরি কোনটি?</span></label>
+                        <div class="radio-group">
+                            <div><input type="radio" id="need_1" name="mainNeed" value="Jobs"><label for="need_1">Better job opportunities / ভালো কাজের সুযোগ</label></div>
+                            <div><input type="radio" id="need_2" name="mainNeed" value="Education"><label for="need_2">Better schools and education / ভালো স্কুল ও শিক্ষা</label></div>
+                            <div><input type="radio" id="need_3" name="mainNeed" value="Water/Sanitation"><label for="need_3">Clean drinking water and sanitation / পরিষ্কার পানীয় জল ও শৌচালয়</label></div>
+                            <div><input type="radio" id="need_4" name="mainNeed" value="Healthcare"><label for="need_4">Healthcare services / স্বাস্থ্য পরিষেবা</label></div>
+                            <div><input type="radio" id="need_5" name="mainNeed" value="Govt Schemes"><label for="need_5">Access to government schemes / সরকারি প্রকল্পের সুবিধা</label></div>
+                            <div><input type="radio" id="need_6" name="mainNeed" value="Other"><label for="need_6">Other / অন্যান্য</label></div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.2rem;">Submit Survey</button>
+                <div id="successMessage">Survey submitted successfully. Thank you!</div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ARES | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Logic for Conditional Questions ---
+            const rationCardYes = document.getElementById('rationCardYes');
+            const rationCardNo = document.getElementById('rationCardNo');
+            const rationCardTypeGroup = document.getElementById('rationCardTypeGroup');
+
+            const schoolGoYes = document.getElementById('schoolGoYes');
+            const schoolGoNo = document.getElementById('schoolGoNo');
+            const schoolReasonGroup = document.getElementById('schoolReasonGroup');
+
+            const loanYes = document.getElementById('loan_yes');
+            const loanNo = document.getElementById('loan_no');
+            const loanSourceGroup = document.getElementById('loanSourceGroup');
+
+            function handleConditionalDisplay(yesRadio, noRadio, conditionalGroup, showOnYes = true) {
+                function toggle() {
+                    const shouldShow = showOnYes ? yesRadio.checked : noRadio.checked;
+                    conditionalGroup.style.display = shouldShow ? 'block' : 'none';
+                }
+                yesRadio.addEventListener('change', toggle);
+                noRadio.addEventListener('change', toggle);
+            }
+
+            handleConditionalDisplay(rationCardYes, rationCardNo, rationCardTypeGroup, true);
+            handleConditionalDisplay(schoolGoYes, schoolGoNo, schoolReasonGroup, false); // Shows on 'No'
+            handleConditionalDisplay(loanYes, loanNo, loanSourceGroup, true);
+
+            // --- Logic for Form Submission ---
+            const form = document.getElementById('surveyForm');
+            const successMessage = document.getElementById('successMessage');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+                
+                successMessage.style.display = 'block';
+                form.reset();
+                
+                // Hide conditional sections again after reset
+                rationCardTypeGroup.style.display = 'none';
+                schoolReasonGroup.style.display = 'none';
+                loanSourceGroup.style.display = 'none';
+
+                setTimeout(function() {
+                    successMessage.style.display = 'none';
+                }, 4000);
+            });
+            
+            // --- Logic for Geolocation ---
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const locationInput = document.getElementById('surveyLocation');
+
+            getLocationBtn.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+
+                getLocationBtn.textContent = 'Fetching...';
+                getLocationBtn.disabled = true;
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+
+                        fetch(apiUrl)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data && data.display_name) {
+                                    locationInput.value = data.display_name;
+                                } else {
+                                    locationInput.value = 'Could not determine address.';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching address:', error);
+                                locationInput.value = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
+                                alert("Could not fetch address, but coordinates were found.");
+                            })
+                            .finally(() => {
+                                getLocationBtn.textContent = 'Get Current Location';
+                                getLocationBtn.disabled = false;
+                            });
+                    },
+                    (error) => {
+                        let errorMessage = 'Could not get location. ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += "You denied the request for Geolocation.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += "The request to get user location timed out.";
+                                break;
+                            default:
+                                errorMessage += "An unknown error occurred.";
+                                break;
+                        }
+                        alert(errorMessage);
+                        getLocationBtn.textContent = 'Get Current Location';
+                        getLocationBtn.disabled = false;
+                    }
+                );
+            });
+        });
+    </script>
+</body>
+</html>

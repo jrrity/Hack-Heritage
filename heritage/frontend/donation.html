@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donate Now - ARES</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #005B5B;
+      --secondary: #FF6F61;
+      --bg: #f7f9fc;
+      --text: #333;
+      --card-bg: #fff;
+      --font-heading: 'Poppins', sans-serif;
+      --font-body: 'Nunito Sans', sans-serif;
+    }
+    * {box-sizing:border-box;margin:0;padding:0;}
+    body {font-family:var(--font-body); background:var(--bg); color:var(--text);}
+    header {
+      background: linear-gradient(90deg, var(--primary), #008080);
+      color:#fff; padding:15px 0; position:fixed; top:0; width:100%; z-index:1000;
+      box-shadow:0 4px 20px rgba(0,0,0,0.2);
+    }
+    header .container {display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:auto; padding:0 20px;}
+    .logo {font-family:var(--font-heading); font-size:1.8rem; font-weight:700;}
+    .btn {cursor:pointer; font-weight:700; padding:12px 28px; border-radius:40px; border:none; transition:0.3s ease;}
+    .btn-primary {background:var(--secondary); color:#fff; box-shadow:0 3px 8px rgba(0,0,0,0.2);}
+    .btn-primary:hover {background:#e65a4c; transform:translateY(-2px);}
+    main {padding-top:120px;}
+    .donation-section {display:grid; grid-template-columns:1.5fr 1fr; gap:40px; max-width:1200px; margin:auto; padding:20px;}
+    .card {
+      background:var(--card-bg); padding:30px; border-radius:15px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.08); transition:0.3s;
+    }
+    .card:hover {transform:translateY(-4px);}
+    h3 {font-family:var(--font-heading); margin-bottom:20px; font-size:1.6rem;}
+    label {font-weight:700; display:block; margin-bottom:6px;}
+    input {
+      width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;
+      font-size:1rem; margin-bottom:15px; transition:border 0.2s;
+    }
+    input:focus {outline:none; border-color:var(--primary);}
+    .reserve-fund-total {
+      font-size:2.5rem; font-weight:700; color:var(--primary);
+      text-shadow:0 0 10px rgba(0,91,91,0.3);
+    }
+    #successMessage {
+      display:none; margin-top:15px; padding:12px; border-radius:8px;
+      background:#5A7D3A; color:#fff; font-weight:700; text-align:center;
+    }
+    /* preset buttons */
+    .preset-row {display:flex; gap:10px; margin-bottom:15px;}
+    .preset-btn {
+      flex:1; text-align:center; padding:12px; border-radius:8px;
+      border:1px solid #ddd; background:#f0f0f0; font-weight:700;
+      cursor:pointer; transition:0.3s;
+    }
+    .preset-btn:hover {background:#e9e9e9;}
+    .preset-btn.active {background:var(--primary); color:#fff; border-color:var(--primary);}
+    /* Responsive */
+    @media(max-width:900px) {
+      .donation-section {grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="logo">ARES Transparency</div>
+    <button id="connectButton" class="btn btn-primary">Connect Wallet</button>
+    <span id="connectionStatus" style="margin-left:10px; font-weight:700;"></span>
+  </div>
+</header>
+
+<main>
+  <section class="donation-section">
+    <!-- Donation Form -->
+    <div class="card">
+      <h3>Make a Donation</h3>
+      <form id="donationForm">
+        <label>Select Quick Amount</label>
+        <div class="preset-row">
+          <div class="preset-btn" data-amount="0.01">0.01 ETH</div>
+          <div class="preset-btn" data-amount="0.05">0.05 ETH</div>
+          <div class="preset-btn" data-amount="0.1">0.1 ETH</div>
+        </div>
+
+        <label>Or Enter Custom Amount (ETH)</label>
+        <input type="text" id="customAmount" placeholder="e.g., 0.025" required />
+
+        <label>Full Name</label>
+        <input type="text" id="fullName" required />
+
+        <label>Email</label>
+        <input type="email" id="email" required />
+
+        <button type="submit" id="submitBtn" class="btn btn-primary" style="width:100%;">Donate Now</button>
+        <div id="successMessage"></div>
+      </form>
+    </div>
+
+    <!-- Reserve Fund -->
+    <div class="card">
+      <h3>Community Reserve Fund</h3>
+      <p>Available Funds</p>
+      <div class="reserve-fund-total" id="currentAmount">-- ETH</div>
+      <p style="margin-top:10px;color:#666;">Funds available for verified expenses</p>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const form = document.getElementById("donationForm");
+  const amountInput = document.getElementById("customAmount");
+  const nameInput = document.getElementById("fullName");
+  const emailInput = document.getElementById("email");
+  const successMessage = document.getElementById("successMessage");
+  const submitBtn = document.getElementById("submitBtn");
+  const currentAmountText = document.getElementById("currentAmount");
+  const connectButton = document.getElementById("connectButton");
+  const statusElement = document.getElementById("connectionStatus");
+  const presetButtons = document.querySelectorAll(".preset-btn");
+
+  const contractAddress = "0x2eE2b2cCeFA3F6D7Bf6CfF335b090A8602c464dd";
+  const contractABI = [
+    {"inputs":[{"internalType":"string","name":"description","type":"string"}],
+     "name":"donate","outputs":[],"stateMutability":"payable","type":"function"},
+    {"inputs":[],"name":"totalDonated","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+    {"inputs":[],"name":"totalSpent","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+  ];
+
+  let provider, signer, contract;
+
+  async function connectWallet() {
+    if (!window.ethereum) return alert("Install MetaMask!");
+    try {
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      provider = new ethers.BrowserProvider(window.ethereum);
+      signer = await provider.getSigner();
+      contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const address = await signer.getAddress();
+      connectButton.textContent = address.substring(0,6)+"..."+address.slice(-4);
+      connectButton.disabled = true;
+      updateReserveFund();
+    } catch(err){ console.error(err); statusElement.textContent="Connection failed"; }
+  }
+
+  async function updateReserveFund() {
+    try {
+      const donated = await contract.totalDonated();
+      const spent = await contract.totalSpent();
+      const available = donated - spent;
+      currentAmountText.textContent = ethers.formatEther(available)+" ETH";
+    } catch(err) { currentAmountText.textContent="Error"; }
+  }
+
+  presetButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      presetButtons.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      amountInput.value = btn.dataset.amount;
+    });
+  });
+
+  form.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    if (!contract) return alert("Connect wallet first");
+    const amount = amountInput.value.trim();
+    if (!amount || isNaN(amount) || parseFloat(amount)<=0) return alert("Enter valid amount");
+    const desc = `Donation from ${nameInput.value} (${emailInput.value})`;
+    submitBtn.disabled=true; submitBtn.textContent="Processing...";
+    try {
+      const tx = await contract.donate(desc, { value: ethers.parseEther(amount) });
+      await tx.wait();
+      successMessage.textContent="✅ Donation confirmed!";
+      successMessage.style.display="block";
+      form.reset(); presetButtons.forEach(b=>b.classList.remove("active"));
+      updateReserveFund();
+    } catch(err) {
+      alert("Donation failed: "+(err.reason||err.message));
+    } finally {
+      submitBtn.disabled=false; submitBtn.textContent="Donate Now";
+    }
+  });
+
+  connectButton.addEventListener("click", connectWallet);
+  updateReserveFund();
+});
+</script>
+</body>
+</html>
