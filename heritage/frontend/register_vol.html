@@ -303,47 +303,48 @@
     </footer>
 
     <script>
-        // --- START OF JAVASCRIPT FOR FORM SUBMISSION ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('volunteerForm');
-            const volunteerGrid = document.getElementById('volunteerGrid');
-            const successMessage = document.getElementById('successMessage');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('volunteerForm');
+    const successMessage = document.getElementById('successMessage');
 
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-                const formData = new FormData(form);
-                const fullName = formData.get('fullName');
-                const address = formData.get('address');
-                const availability = formData.get('availability');
-                const interests = formData.getAll('interests');
+        const formData = new FormData(form);
+        const interests = formData.getAll('interests');
 
-                const newCard = document.createElement('div');
-                newCard.className = 'volunteer-card';
-                
-                let interestsHTML = '';
-                interests.forEach(function(interest) {
-                    interestsHTML += `<span class="interest-tag">${interest}</span>`;
-                });
+        const payload = {
+            fullName: formData.get('fullName'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            availability: formData.get('availability'),
+            interests: interests
+        };
 
-                newCard.innerHTML = `
-                    <h4>${fullName}</h4>
-                    <p>📍 ${address.split(',')[0]}</p>
-                    <p>Availability: ${availability.charAt(0).toUpperCase() + availability.slice(1)}</p>
-                    <div class="interests">${interestsHTML}</div>
-                `;
+        try {
+            const response = await fetch('http://127.0.0.1:5000/register/volunteer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-                volunteerGrid.prepend(newCard);
+            const result = await response.json();
+            if (response.ok) {
                 successMessage.style.display = 'block';
                 form.reset();
-                
-                setTimeout(function() {
-                    successMessage.style.display = 'none';
-                }, 4000);
-            });
-        });
-        // --- END OF JAVASCRIPT ---
-    </script>
+                setTimeout(() => { successMessage.style.display = 'none'; }, 4000);
+            } else {
+                alert("Error: " + result.error);
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+            alert("Could not connect to the server.");
+        }
+    });
+});
+</script>
+
 
 </body>
 </html>

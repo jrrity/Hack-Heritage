@@ -114,6 +114,35 @@ def debug():
 
 from flask import request
 
+from flask import request
+
+@app.route("/register/volunteer", methods=["POST"])
+def register_volunteer():
+    try:
+        data = request.get_json()
+        if not data:
+            return json_response({"error": "No data provided"}), 400
+
+        volunteer_doc = {
+            "fullName": data.get("fullName"),
+            "email": data.get("email"),
+            "phone": data.get("phone"),
+            "address": data.get("address"),
+            "interests": data.get("interests", []),
+            "availability": data.get("availability"),
+            "registration_date": datetime.utcnow()
+        }
+
+        result = db.volunteers.insert_one(volunteer_doc)
+        print(f"New volunteer registered with ID: {result.inserted_id}")
+
+        return json_response({"message": "Volunteer registration successful", "id": str(result.inserted_id)})
+
+    except Exception as e:
+        print(f"Error registering volunteer: {e}")
+        return json_response({"error": str(e)}), 500
+
+
 @app.route("/register/ngo", methods=["POST"])
 def register_ngo():
     try:
